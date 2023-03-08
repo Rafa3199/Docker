@@ -1,0 +1,60 @@
+Inicio:
+
+1. O que é Docker? O que é um Container?
+Container: É uma maneira de guardar aplicações com todas as dependências necessárias e configurações. É um artefato portátil, de fácil compartilhamento. Pode ser facilmente transportado entre o time de Dev e o time de Ops.
+
+Permite o processo de desenvolvimento e lançamento da aplicação ser mais eficiente.
+Onde os containers ficam? Eles ficam num repositório de containers, podendo ser um repositório privado ou Público, a depender da empresa. 
+Repositório Público: hub.docker.com;
+
+O que muda com os Containers? Antes, o processo de Desenvolvimento de uma aplicação era feito de maneira tal que diferentes desenvolvedores, com diferentes tipos de máquinas, necessitavam baixar e instalar cada aplicativo usado no desenvolvimento em suas máquinas. O problema é que dependendo da máquina ou de diferentes versões dos aplicativos, por exemplo, isso poderia gerar problemas para os desenvolvedores.
+
+Comandos, códigos, execuções, muita coisa varia de uma máquina para outra (Mac vs Linux), até mesmo de uma versão para outra, às vezes.
+
+Com os Containers, não é mais necessário instalar nenhum dos serviços agregados aquele desenvolvimento diretamente na sua máquina, porque o Container é um sistema operacional próprio, que “empacota” todas as configurações necessárias para que aquele trabalho seja transportado facilmente entre uma máquina e outra, levando todas as aplicações e serviços necessárias para o desenvolvimento daquele trabalho.
+
+Resumindo, o Docker transformou a maneira que as coisas eram desenvolvidas, por solucionar o problema de “transporte” dos serviços e aplicações agregadas ao trabalho de uma maneira rápida, prática e eficiente.
+
+Alguns comandos e suas aplicações:
+ 	"docker images" - Lista as imagens disponíveis
+	"docker ps" - Lista todos os containers ativos
+	"docker ps -a" - Lista todos os containers
+	"docker run (image)" - Cria um novo container com a imagem desejada
+	"docker run -it (image)" - Cria um container no modo interativo
+	"docker run -P" - Mapeia a porta e automaticamente conecta na porta do host
+	"docker run -d (image)" - Cria um container no background, sem expor o passo a passo para criação daquele container
+	"docker run -e (variável)" - "-e" é para exportar variáveis de determinada imagem
+	"docker run --name (nome) -it (image) - Cria um container interativo com nomepersonalizado
+	"docker exec" - Executa comandos nos containers
+	"docker start/stop/restart (container)" - Comandos para containers já existentes
+	"docker rm (container)" - Remove containers
+	"docker rmi (image)" - Remove images
+
+É possível mapear todo o passo a passo para subir um container:
+
+	"docker inspect (image) - Mostra inforações sobre a imagem e quais arquivos ela vai
+					  executar para funcionar corretamente
+	"docker logs (container) - Mostra todo o log do container do seu inicio até o ponto atual
+
+Rodamos o "docker inspect" para entender quais arquivos e comandos vão ser executados para o correto funcionamento do container. E "docker logs" para verificar passo a passo a ativação do container e assim conseguimos analisar em qual passo ou etapa possa ter dado um erro e saber o que exatamente corrigir.
+
+Bind Mounts (mudanças em tempo real entre o container e a máquina do host):
+	"docker -v (caminho da pasta destino):(caminho da pasta do container) (nome da imagem)" - Armazenar na máquina local do usuário, os dados do container que será criado
+
+Exemplo prático de tudo isso que vimos até agora sobre o "docker run":
+	"docker run --name vprodb -d -e MYSQL_ROOT_PASSWORD=senha123 -p 3030:3306 -v /home/ubuntu/vprodbdata:/var/lib/mysql mysql:5.7"
+
+Para que o exemplo acima funcione precisamos ter feito alguns passos antes:
+	- Criar a pasta de destino na máquina local
+	- Inspecionar o caminhoa que os dados são criados no container
+	- Inspecionar as portas disponíveis para a imagem
+	- Verificar a necessidade de variáveis para o container funcoinar (documentação oficial da imagem no hub.docker.com
+
+Containers Volumes (Preservação dos dados):
+O comando é basicamente o mesmo que o Bind Mounts, apenas uma pequena diferença:
+	"docker run --name vprodb -d -e MYSQL_ROOT_PASSWORD=senha123 -p 3030:3306 -v mydbdata:/var/lib/mysql mysql:5.7"
+
+Para que o exemplo acima funcione precisamos ter feito alguns passos antes:
+	- Criar um volume com o comando "docker volume create (nome)
+	- Mudar o comando para que ao invés do caminho da pasta, como era no Bind Mounts, ele ir para o Volume criado
+	- É importante notar que o comando é o mesmo do Bind Mounts apenas por exemplo, não seria possível executar o mesmo comando com o mesmo nome associado e a mesma porta de destino.
