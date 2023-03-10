@@ -1,4 +1,4 @@
-Inicio:
+01 - Inicio:
 
 1. O que é Docker? O que é um Container?
 Container: É uma maneira de guardar aplicações com todas as dependências necessárias e configurações. É um artefato portátil, de fácil compartilhamento. Pode ser facilmente transportado entre o time de Dev e o time de Ops.
@@ -38,7 +38,8 @@ Alguns comandos e suas aplicações:
 
 Rodamos o "docker inspect" para entender quais arquivos e comandos vão ser executados para o correto funcionamento do container. E "docker logs" para verificar passo a passo a ativação do container e assim conseguimos analisar em qual passo ou etapa possa ter dado um erro e saber o que exatamente corrigir.
 
-Bind Mounts (mudanças em tempo real entre o container e a máquina do host):
+
+02 - Bind Mounts (mudanças em tempo real entre o container e a máquina do host):
 	"docker -v (caminho da pasta destino):(caminho da pasta do container) (nome da imagem)" - Armazenar na máquina local do usuário, os dados do container que será criado
 
 Exemplo prático de tudo isso que vimos até agora sobre o "docker run":
@@ -58,3 +59,77 @@ Para que o exemplo acima funcione precisamos ter feito alguns passos antes:
 	- Criar um volume com o comando "docker volume create (nome)
 	- Mudar o comando para que ao invés do caminho da pasta, como era no Bind Mounts, ele ir para o Volume criado
 	- É importante notar que o comando é o mesmo do Bind Mounts apenas por exemplo, não seria possível executar o mesmo comando com o mesmo nome associado e a mesma porta de destino.
+
+Building Images:
+Precisamos criar um "Dockerfile" para que ele receba as instruções para criação da nossa "image". O que vai conter nesse "Dockerfile"?!
+
+	- FROM --> Imagem base (Ubuntu, MySQL...)
+	- LABELS --> Adiciona metada para a imagem
+	- RUN --> Se quisermos fazer mudanças, instalar um pacote, criar um diretório ou arquivo. Qualquer comando que se queira executar.
+	- ADD/COPY --> Vai copiar ou adicionar um arquivo na sua imagem
+	- CMD --> Executa binaries/commands no comando "docker run"
+	- ENTRYPOINT --> Vai ter maior escala de prioridade. Permite configurar um container que irá rodar como executável.
+	- VOLUME --> Cria um ponto de montagem e marca como um "holding" externo de volumes montados
+	- EXPOSE --> Container vai atribuir uma porta específica no "docker run"
+	- ENV --> Sets the environment variable
+	- USER --> Sets the user namo (or UID)
+	- WORKDIR --> Sets the working directory
+	- ARG --> Defines a variable that users can pass at build-time
+	- ONBUILD --> Adds to the image a trigger instruction to be executed at a later time
+
+Documentação: https://docs.docker.com/engine/reference/builder/
+
+Vamos ver tudo isso num exemplo (Projeto de Website):
+	- Pegar um modelo de website no tooplate.com
+		- Definir o template
+		- Apertar "F12" para abrir o log
+		- Ir na área de "Network" do log
+		- Baixar o endereço da pasta .zip do site
+	- Fazer uma pasta com o nome do projeto
+	- Dentro da pastar usar o "wget" com o link do template para puxar as informações
+	- Instalar o "unzip" caso não esteja instalado
+	- Usar o "unzip" no arquivo .zip criado
+	- No diretório criado, usar o seguinte comando:
+		- tar czvf nano.tar.gz * (pesquisar sobre isso, ainda não entendi 100%)
+		- mv nano.tar.gz ../
+		- Isso vai gerar um arquivo "tarball" no diretório do projeto
+	- Remova os arquivos não desejados, se quiser
+	- Mova o "artifato" tarball para a pasta criada do .zip
+	- Na pastar criada do .zip usar o comando "vim" para editar um arquivo que vamos chamar de "Dockerfile"
+	- Utilizar as seguintes instruções:
+"
+FROM ubuntu:latest (exemplo)
+LABEL "Author"="Rafael" (exemplo)
+LABEL "Project"="nano" (exemplo)
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt update && apt install git -y (exemplo)
+RUN apt install apache2 -y (exemplo)
+CMD ["/usr/sbin/apache2ctl", "-D", "FOREGROUND"]
+EXPOSE 80 (exemplo)
+WORKDIR /var/www/html (exemplo)
+VOLUME /var/log/apache2 (exemplo)
+ADD nano.tar.gz /var/www/html (exemplo)
+#COPY nano.tar.gz /var/www/html
+"
+Obs.: A diferença do comando COPY para o ADD é que o ADD vai "untar" o arquivo no local indicado, enquanto o COPY vai apenas jogar o arquivo lá.
+
+	- Use o comando "docker build" para criar sua imagem:
+		- "docker build -t nanoimg"
+	- Você pode verificar sua imagem criada com o "docker images"
+	- Agora crie o container da sua imagem
+		- "docker run -d --name nanowebsite -p 9080:80 nanoimg
+	- Agora você já pode verificar o website funcionando através do endereço:
+		- IP:port
+
+Como jogar essa imagem no hub.docker?
+
+	- Crie uma imagem com o nome do seu usuário do hub.docker como pré-fixo:
+		- "docker build -t rafa3199/nanoimg
+	- Faça login no hub.docker atráves do comando "docker login"
+	- Preencha seu usuário e senha
+	- Suba a sua imagem para um repositório publico que será criado automaticamente no hub.docker
+		- "docker push rafa3199/nanoimg
+	- Abra os seus repositórios no Docker e verifique se foi criado corretamente
+	- Limpe o seu ambiente e faça um teste para tentar puxar a sua imagem criada direto do seu repositório no hub.docker
+		- docker run -d --name nanowebsite -p 9080:80 rafa3199/nanoimg
+	
