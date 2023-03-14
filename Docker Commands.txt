@@ -39,7 +39,8 @@ Alguns comandos e suas aplicações:
 Rodamos o "docker inspect" para entender quais arquivos e comandos vão ser executados para o correto funcionamento do container. E "docker logs" para verificar passo a passo a ativação do container e assim conseguimos analisar em qual passo ou etapa possa ter dado um erro e saber o que exatamente corrigir.
 
 
-02 - Bind Mounts (mudanças em tempo real entre o container e a máquina do host):
+02 - Bind Mounts x Volumes
+Bind Mounts (mudanças em tempo real entre o container e a máquina do host):
 	"docker -v (caminho da pasta destino):(caminho da pasta do container) (nome da imagem)" - Armazenar na máquina local do usuário, os dados do container que será criado
 
 Exemplo prático de tudo isso que vimos até agora sobre o "docker run":
@@ -47,9 +48,9 @@ Exemplo prático de tudo isso que vimos até agora sobre o "docker run":
 
 Para que o exemplo acima funcione precisamos ter feito alguns passos antes:
 	- Criar a pasta de destino na máquina local
-	- Inspecionar o caminhoa que os dados são criados no container
+	- Inspecionar o caminho que os dados são criados no container
 	- Inspecionar as portas disponíveis para a imagem
-	- Verificar a necessidade de variáveis para o container funcoinar (documentação oficial da imagem no hub.docker.com
+	- Verificar a necessidade de variáveis para o container funcoinar (documentação oficial da imagem no hub.docker.com)
 
 Containers Volumes (Preservação dos dados):
 O comando é basicamente o mesmo que o Bind Mounts, apenas uma pequena diferença:
@@ -132,4 +133,31 @@ Como jogar essa imagem no hub.docker?
 	- Abra os seus repositórios no Docker e verifique se foi criado corretamente
 	- Limpe o seu ambiente e faça um teste para tentar puxar a sua imagem criada direto do seu repositório no hub.docker
 		- docker run -d --name nanowebsite -p 9080:80 rafa3199/nanoimg
+
+Aula 03 - Entendendo a diferença entre o CMD e ENTRYPOINT
+São parecidos, mas executam funções diferentes. O CMD pode conter o comando e o argumento, enquanto o ENTRYPOINT só possui o comando. O que isso quer dizer?
+
+Quer dizer que, dependendo da necessidade do usuário, na hora de criar uma imagem ele pode tanto usar apenas o CMD para determinar qual o comando e argumento a ser executado, como pode usar apenas o ENTRYPOINT para passar a determinar a argumento, ou usar os dois juntos para ter um argumento padrão, mas também poder sobrescrever o argumento padrão.
+
+Exemplo:
+
+CMD ["echo", "hello"] - Quando a imagem for criada e executada, vai printar na tela o "hello" todas as vezes.
+
+ENTRYPOINT ["echo"] - No comando do "docker build" é preciso determinar o argumento, ou irá sempre imprimir uma linha vazia.
+	- docker build -t printer:v1 hello <-- Vai imprimir "hello" na tela
+
+ENTRYPOINT ["echo"] - Temos o comando que será executado
+CMD ["hello"] - E o argumento padrão, que por estarmos também usando o ENTRYPOINT, podemos determinar o argumento que queremos.
+	- docker build -t printer:v1 hi <-- Vai imprimir "hi" ou invés de "hello" na tela
+Essa estrutura também é utilizada para dar prioridade ao comando a ser executado, pois o ENTRYPOINT tem prioridade 0 na hora da execução.
+
+Aula 04 - Docker Compose
+Docker Compose é uma ferramenta para rodar multi containers ao mesmo tempo. O principal ponto do Docker Compose é evitar erros humanos, quando estamos trabalhando com vários e vários containers ao mesmo tempo.
+
+Outro beneficio é que o arquivo do Docker Compose vai ser parte do seu repositório, qualquer mudança que for feita, vai ser rastreada.
+
+Criamos arquivos de serviços que desejamos utilizar e colocamos dentro de uma mesma pasta com o Dockerfile. Para conciliar tudo, criamos um arquivo de "docker-compose.yml"
+
+(DETALHAR MAIS ESSA PARTE, ASSIM QUE POSSIVEL)
+
 	
