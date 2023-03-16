@@ -158,6 +158,88 @@ Outro beneficio é que o arquivo do Docker Compose vai ser parte do seu reposit�
 
 Criamos arquivos de serviços que desejamos utilizar e colocamos dentro de uma mesma pasta com o Dockerfile. Para conciliar tudo, criamos um arquivo de "docker-compose.yml"
 
-(DETALHAR MAIS ESSA PARTE, ASSIM QUE POSSIVEL)
+Vamos entender mais afundo com o exercicio prático proposto no própio site de documentação do Docker:
 
-	
+	- Como dito anteriormente, se faz necessário a criação de uma pasta de destino para os arquivos que vão ser criados para o Docker Compose, então crie um diretório. De preferencia, dentro da pasta do usuário, para não se ter problemas de permissões.
+	- Logo após, começamos a criar os arquivos
+
+1º Arquivo: app.py
+-----------------------------------------------------------------------------------------------
+import time
+
+import redis
+from flask import Flask
+
+app = Flask(__name__)
+cache = redis.Redis(host='redis', port=6379)
+
+def get_hit_count():
+    retries = 5
+    while True:
+        try:
+            return cache.incr('hits')
+        except redis.exceptions.ConnectionError as exc:
+            if retries == 0:
+                raise exc
+            retries -= 1
+            time.sleep(0.5)
+
+@app.route('/')
+def hello():
+    count = get_hit_count()
+    return 'Hello World! I have been seen {} times.\n'.format(count)
+-----------------------------------------------------------------------------------------------
+Como mencionado anteriormente, criamos arquivos dos serviços que vamos querer usar no Docker Compose, e este exemplo vai utilizando um arquivo de Python.
+
+2º Arquivo: requirements.txt
+-----------------------------------------------------------------------------------------------
+flask
+redis
+-----------------------------------------------------------------------------------------------
+Esse arquivo é apenas para listar serviços que vão ser necessários para roda nosso código.
+
+3º Arquivo: Dockerfile
+-----------------------------------------------------------------------------------------------
+# syntax=docker/dockerfile:1
+FROM python:3.7-alpine
+WORKDIR /code
+ENV FLASK_APP=app.py
+ENV FLASK_RUN_HOST=0.0.0.0
+RUN apk add --no-cache gcc musl-dev linux-headers
+COPY requirements.txt requirements.txt
+RUN pip install -r requirements.txt
+EXPOSE 5000
+COPY . .
+CMD ["flask", "run"]
+-----------------------------------------------------------------------------------------------
+Esse já conhecemos, é o arquivo padrão para criar uma imagem no Docker, que será usado para o Docker Compose da mesma maneira. Esse arquivo de Dockerfile está dizendo ao Docker para:
+	1. Criar uma imagem iniciando com a imagem do Python 3.7
+	2. Definir o diretório de trabalho para /code
+	3. Definir o ambiente que será usado pelo comando "flask"
+	4. Instalar o gcc e outras dependencias
+	5. Copiar o arquivo "requirements.txt" e instalar a dependencia do Python
+	6. Adicionar metadata a imagem para descrever que o container está na porta 5000
+	7. Copiar a pasta atual - "." - no diretório de trabalho da imagem
+	8. Definir o comando padrão para o container para "flask run"
+
+4º Arquivo: docker-compose.yml
+-----------------------------------------------------------------------------------------------
+version: "3.9"
+services:
+  web:
+    build: .
+    ports:
+      - "8000:5000"
+  redis:
+    image: "redis:alpine"
+-----------------------------------------------------------------------------------------------
+Esse arquivo define dois serviços: "web" e "redis".
+O serviço "web" use a imagem feita pelo "Dockerfile" na pasta atual. Então, combina o container e a máquina do host para a porta de entrada "8000". Esse exemplo use a porta de padrão para o Flask Web Service, 5000.
+
+O serviço "redis" usa a imagem pública do Redis, puxada do Docker Hub.
+
+	- Por fim, execute o docker compose
+		- Esteja no diretório de trabalho onde foram criados todos os arquivos e o arquivo do Docker Compose
+		- Em seguida, execute o comando de execução:
+			"docker compose up"
+	- No caso de estar na AWS utilize o IP + porta definida para acesar o container criado
