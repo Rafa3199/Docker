@@ -1,0 +1,10 @@
+vagrant init (box name) - Pegar o nome do box no site oficial do Vagrant
+vagrant up
+vagrant ssh
+vagrant halt
+vagrant destroy
+vagrant reload
+
+Utilizei Vagrant para entender o Projeto que foi construido, nas aulas que estive assistindo, entendi os conceitos básicos e facilitações que o Vagrant trouxe na hora de criar VM's, desde o processo manual de configurar o Vagrantfile para uma máquina virtual, até o processo automatizado de subir várias máquinas virtuais ao mesmo tempo, quer conversam entre si.
+
+É importante entender os processos de forma manual, pois só assim vamos conseguir analisar e entender o erro que possa vir a ocorrer num processo automatizado e saber exatamente e onde corrigi-lo.

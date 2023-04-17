@@ -1,0 +1,29 @@
+MULTISTAGE DOCKERFILE:
+
+- É criado para automarizar etapas na criação de um projeto:
+
+EXEMPLO:
+Dockerfile
+-----------------------------------------------------------------------------------------------
+FROM openjdk:8 AS BUILD_IMAGE
+RUN apt update && apt install maven -y
+RUN git clone -b vp-docker https://github.com/imranvisualpath/vprofile-repo.git
+RUN cd vprofile-repo && mvn install
+
+FROM tomcat:8-jre11
+
+RUN rm -rf /usr/local/tomcat/webapps/*
+COPY --from=BUILD_IMAGE vprofile-repo/target/vprofile-v2.war /usr/locarl/tomcat/webapps/ROOT.war
+EXPOSE 8080
+CMD ["catalina.sh", "run"]
+-----------------------------------------------------------------------------------------------
+
+Quando fizemos toda a conternerização do projeto "vprofile" no curso de DevOps, todo esse estágio fizemos manual, primeiro instalando a imagem do "tomcat", em seguida digitando o command line para atualizar e baixar o "jdk" e "maven". 
+
+Após isso ainda, fizemos manualmente o comando para excluir o arquivo da pasta do tomcat e novamente, de maneira manual, movemos o nosso artifato para o local da pasta.
+
+O inuito final do DevOps é simplificar a vida de quem programa, desenvolve, ser um suporte, então se busca sempre alternativas de otimizar a automatizar processos, o que é o caso quando falamos de MULTI STAGE DOCKERFILE.
+
+Como conseguimos ver no exemplo acima, esse arquivo vai fazer tudo o que fizemos de maneira manual, de forma automática, transformando todo esse processo numa imagem personalizada que através do comando "docker build -t"
+
+docker compose build (explicar)

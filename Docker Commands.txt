@@ -243,3 +243,9 @@ O serviço "redis" usa a imagem pública do Redis, puxada do Docker Hub.
 		- Em seguida, execute o comando de execução:
 			"docker compose up"
 	- No caso de estar na AWS utilize o IP + porta definida para acesar o container criado
+
+EXTRA:
+-----------------------------------------------------------------------------------------------
+O comando:
+	- docker rm $(docker ps -aq)
+Vai excluir todos os containers ao mesmo tempo, sem precisar listar um por um individualmente. É importante lembrar que se tiver qualquer container ativo, o comando não irá funcionar.
