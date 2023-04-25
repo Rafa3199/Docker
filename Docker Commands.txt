@@ -249,3 +249,21 @@ EXTRA:
 O comando:
 	- docker rm $(docker ps -aq)
 Vai excluir todos os containers ao mesmo tempo, sem precisar listar um por um individualmente. É importante lembrar que se tiver qualquer container ativo, o comando não irá funcionar.
+
+Formantando "docker ps":
+	- docker ps --format=$FORMAT
+É usado para formatar a maneira que o "docker ps" é exibido e para isso, é necessário configurar a variável "FORMAT".
+
+Para configurar a variável "FORMAT" usamos o seguinte comando:
+	- export FORMAT="ID\t{{.ID}}\nNAME\t{{.Names}}\nImage\t{{.Image}}\nPORTS\t{{.Ports}}\nCOMMAND\t{{.Command}}\nCREATED\t{{.CreatedAt}}\nSTATUS\t{{.Status}}\n"
+
+E então, depois é só digitar o "docker ps --format=$FORMAT" para que seja exibida a nova configuração do "docker ps".
+
+Sobre "Volumes":
+É importante anotar que ele cria um ambiente interativo entre o container e determinada pasta de arquivos do usuário, podendo também configurar o ambiente para "Read Only" e deixa-lo mais seguro. De qualquer forma, é importante perceber que o comando de "Volumes" do Docker permite que seu usuário possa manipular seu ambiente de maneira mais ágil.
+
+E ser ágil é a principal premissa do DevOps, alinhado com automação.
+
+Compartilhando Volumes entre containers:
+	- docker run --name website-copy --volumes-from website -d -p 8081:80 nginx
+Esse comando cria uma cópia dos arquivos do container especificado, nesse caso o "website" e replica no container que está sendo criado, nesse caso o "website-copy", criando um backup, ou uma espécie de snapshot do container, para testes ou afins.
