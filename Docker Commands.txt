@@ -267,3 +267,6 @@ E ser ágil é a principal premissa do DevOps, alinhado com automação.
 Compartilhando Volumes entre containers:
 	- docker run --name website-copy --volumes-from website -d -p 8081:80 nginx
 Esse comando cria uma cópia dos arquivos do container especificado, nesse caso o "website" e replica no container que está sendo criado, nesse caso o "website-copy", criando um backup, ou uma espécie de snapshot do container, para testes ou afins.
+
+Alpine:
+Procure sempre versões do tipo "alpine", elas são mais leves, tomando menos tempo para serem inicializadas ou baixadas. Isso vai ajudar a reduzir também o tamanho dos arquivos e memória usada.
