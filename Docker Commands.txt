@@ -270,3 +270,5 @@ Esse comando cria uma cópia dos arquivos do container especificado, nesse caso 
 
 Alpine:
 Procure sempre versões do tipo "alpine", elas são mais leves, tomando menos tempo para serem inicializadas ou baixadas. Isso vai ajudar a reduzir também o tamanho dos arquivos e memória usada.
+
+Eu amo Gabriela
